@@ -1,42 +1,86 @@
+@font-face {
+  font-family: "Lato";
+  src: url("/fonts/Lato-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #af1056;
+  --dark-primary: #340620;
+  --light: #fff;
+  --element-padding: 1.3rem;
+  --element-padding-sm: 0.9rem;
+  --page-padding: 2rem 4rem;
+  --bs: 0px 10px 20px -20px rgba(0, 0, 0, 0.55);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+.header {
+  padding: 0 var(--element-padding);
+  background-color: var(--light);
+  box-shadow: var(--bs);
+  display: flex;
+  align-items: center;
+  z-index: 2;
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.app-title {
+  margin-bottom: 0 !important;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+.content {
+  background-color: #f0f2f5;
+  padding: var(--page-padding);
+  flex: 1;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+.cardImage {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
+.card {
+  height: 100%;
+}
+
+.card .ant-card-body {
+  padding: var(--element-padding-sm) var(--element-padding);
+}
+
+button.ant-btn-default {
+  color: var(--dark-primary);
+}
+
+button.icon-right {
+  flex-direction: row-reverse;
+}
+
+button.icon-right .anticon {
+  color: var(--primary-color);
+}
+
+.ant-badge-count {
+  font-size: 0.7rem !important;
+}
+
+.ant-badge.primary .ant-badge-count {
+  background: var(--primary-color) !important;
+}
+
+.mb-0 {
+  margin-bottom: 0 !important;
+}
+.mb-1{
+     margin-bottom: 1rem;
+}
+
+.weak-text {
+  opacity: 0.5;
 }

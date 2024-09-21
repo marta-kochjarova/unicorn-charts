@@ -12,11 +12,22 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import Chart from "./_components/Chart";
+import getCovidDataByChartName from "./api/_axios/covid-api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Home() {
-  const { Title, Text } = Typography;
+  const { Title, Text, Paragraph } = Typography;
 
-  const data = [
+  //const {data, error, isLoading} = useQuery(['getCovidDataByChartName'], () => getCovidDataByChartName)
+  //const {data, error, isLoading} = useQuery('getCovidDataByChartName', getCovidDataByChartName)
+  const chartName = 'COVID-19_cases_casesByDay'; // Replace with the actual chart name you want to fetch
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['getCovidDataByChartName', chartName], // Include chartName in the queryKey
+    queryFn: () => getCovidDataByChartName(chartName), // Call the function with chartName
+  });
+
+  const dummydata = [
     { Date: '2023-09-01', Close: 150 },
     { Date: '2023-09-02', Close: 160 },
     { Date: '2023-09-03', Close: 155 },
@@ -92,7 +103,10 @@ export default function Home() {
           <Col span={12}>
             <Card className="card">
               <Title level={5}>Chart Title</Title>
-              <Chart data={data} type={'line'}/>
+              <Chart data={dummydata} type={'line'}/>
+              <Paragraph>
+              {data?.count}
+              </Paragraph>
       
               <Row gutter={[16, 10]}>
                 <Col>
@@ -127,7 +141,7 @@ export default function Home() {
           <Col span={12}>
             <Card className="card">
               <Title level={5}>Chart Title</Title>
-              <Chart data={data} type={'bar'} />
+              <Chart data={dummydata} type={'bar'} />
               <Row gutter={[16, 10]}>
                 <Col>
                   <Avatar size="small" icon={<UserOutlined />} />

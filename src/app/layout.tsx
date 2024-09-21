@@ -3,7 +3,7 @@ import './globals.css'
 import "antd/dist/reset.css";
 import { ConfigProvider } from "antd";
 import customTokens from "./AntCustomTokens";
-import Provider from "./_trpc-client/Provider";
+import Provider from "./clients/Provider";
 
 export const metadata: Metadata = {
   title: "Simple charts app",

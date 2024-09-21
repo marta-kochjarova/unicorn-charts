@@ -11,9 +11,24 @@ import {
   HeartOutlined,
   UserOutlined,
 } from "@ant-design/icons";
+import Chart from "./_components/Chart";
 
 export default function Home() {
-  const { Paragraph, Title, Text } = Typography;
+  const { Title, Text } = Typography;
+
+  const data = [
+    { Date: '2023-09-01', Close: 150 },
+    { Date: '2023-09-02', Close: 160 },
+    { Date: '2023-09-03', Close: 155 },
+    { Date: '2023-09-04', Close: 170 },
+    { Date: '2023-09-05', Close: 165 },
+    { Date: '2023-09-06', Close: 175 },
+    { Date: '2023-09-07', Close: 180 },
+    { Date: '2023-09-08', Close: 178 },
+    { Date: '2023-09-09', Close: 185 },
+    { Date: '2023-09-10', Close: 194 },
+  ];
+  
 
   return (
     <Layout className="layout">
@@ -77,11 +92,8 @@ export default function Home() {
           <Col span={12}>
             <Card className="card">
               <Title level={5}>Chart Title</Title>
-              <img
-                src="https://via.placeholder.com/400"
-                alt="Card 1"
-                className="cardImage mb-1"
-              />
+              <Chart data={data} type={'line'}/>
+      
               <Row gutter={[16, 10]}>
                 <Col>
                   <Avatar size="small" icon={<UserOutlined />} />
@@ -115,11 +127,7 @@ export default function Home() {
           <Col span={12}>
             <Card className="card">
               <Title level={5}>Chart Title</Title>
-              <img
-                src="https://via.placeholder.com/400"
-                alt="Card 1"
-                className="cardImage mb-1"
-              />
+              <Chart data={data} type={'bar'} />
               <Row gutter={[16, 10]}>
                 <Col>
                   <Avatar size="small" icon={<UserOutlined />} />

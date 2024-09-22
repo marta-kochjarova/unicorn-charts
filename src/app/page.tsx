@@ -8,7 +8,7 @@ import getCovidDataByChartName from "./api/_fetch/covid-api";
 import { trpc } from "./clients/trpcClient";
 import { useEffect, useState } from "react";
 import AppHeader from "./_components/AppHeader";
-import { CovidData, CovidMetric } from "./_utils/covidDataTypes";
+import { CovidData } from "./_utils/covidDataTypes";
 import PageHeader from "./_components/PageHeader";
 import { v4 as uuidv4 } from "uuid";
 

@@ -9,7 +9,8 @@ const useTrpcClientInstance = () => {
     trpc.createClient({
       links: [
         httpBatchLink({
-          url: "http://localhost:3000/api/trpc",
+          // url: "http://localhost:3000/api/trpc",
+          url: "https://unicorn-charts.vercel.app/api/trpc",
         }),
       ],
     })

@@ -1,25 +1,31 @@
-import type { Metadata } from "next";
+"use client";
 import './globals.css'
 import "antd/dist/reset.css";
 import { ConfigProvider } from "antd";
 import customTokens from "./AntCustomTokens";
 import Provider from "./clients/Provider";
+import { useEffect, useState } from 'react';
+import Preloader from './_components/Preloader';
 
-export const metadata: Metadata = {
-  title: "Simple charts app",
-  description: "This app was made as an assignment in a job interview process",
-};
+export default function RootLayout({ children }: Readonly<{children: React.ReactNode;}>) {
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const handleContentLoad = () => {
+      setLoading(false); 
+    };
+    requestAnimationFrame(() => {
+      handleContentLoad();
+    });
+
+  }, []);
+  
   return (
     <html lang="en">
       <body>
         <Provider>
           <ConfigProvider theme={customTokens}>
+            {loading ? <Preloader /> : <></>}
             {children}
           </ConfigProvider>
         </Provider>

@@ -1,0 +1,43 @@
+.preloader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--light);
+  z-index: 9999;
+}
+.preloader {
+  color: var(--primary-color);
+}
+.preloader,
+.preloader:after {
+  box-sizing: border-box;
+}
+.preloader {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.preloader:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6.4px solid currentColor;
+  border-color: currentColor transparent currentColor transparent;
+  animation: preloader 1.2s linear infinite;
+}
+@keyframes preloader {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}

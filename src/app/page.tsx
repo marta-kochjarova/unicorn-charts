@@ -16,7 +16,7 @@ export default function Home() {
   const { Title, Text } = Typography;
   const [covidData, setCovidData] = useState<CovidData[]>([]);
 
-  // Fetch current user or create if user doesnt exist
+  // Fetch current user from local storage or create if user doesnt exist
   const CheckOrCreateUserInLS = (): string => {
     if (typeof localStorage !== 'undefined') {
       let userUUID = localStorage.getItem("userUUID"); 
@@ -30,25 +30,50 @@ export default function Home() {
   }
 
   //Fetch user & chart data from DB
-  const { data: userAndChartData, error, isLoading } = trpc.getUserAndChartData.useQuery(CheckOrCreateUserInLS());
+  const { data: userAndChartData, error, isLoading, refetch } = trpc.getUserAndChartData.useQuery(CheckOrCreateUserInLS());
 
   const { user: currentUser, charts: chartsWithLikes } = userAndChartData && 'user' in userAndChartData && 'charts' in userAndChartData 
   ? userAndChartData 
   : { user: undefined, charts: undefined };
 
-  // Fetch COVID data after DB charts are loaded
   useEffect(() => {
     if (chartsWithLikes) {
       const fetchCovidData = async () => {
         const allCovidData = await Promise.all(
-          chartsWithLikes.map((chart) => getCovidDataByChartName(chart.title))
+          chartsWithLikes.map(async (chart) => ({
+            chartId: chart.id,
+            chartData: await getCovidDataByChartName(chart.title),
+            chartLikes: Number(chart.likesCount),
+            isLikedByCurrentUser: chart.isLikedByUser
+          }))
         );
         setCovidData(allCovidData);
+        console.log(allCovidData)
       };
       fetchCovidData();
     }
-
   }, [chartsWithLikes]);
+
+  //handling like feature
+  const toggleLikeMutation = trpc.toggleLike.useMutation();
+
+  interface ToggleLikeParams {
+    userId: number | undefined;
+    chartId: number | undefined;
+  }
+
+  const toggleLike = ({userId, chartId}: ToggleLikeParams) => {
+    if(userId != undefined && chartId != undefined){
+      toggleLikeMutation.mutate({userId, chartId});
+      refetch();
+      setCovidData(covidData.map((data) => { 
+        return data.chartId == chartId ? {
+        ...data,
+        isLikedByCurrentUser: !data.isLikedByCurrentUser,
+        chartLikes: data.isLikedByCurrentUser ? Number(data.chartLikes)-1 : Number(data.chartLikes)+1
+        } : data}));
+    }
+  }
 
   return (
     <Layout className="layout">
@@ -66,53 +91,49 @@ export default function Home() {
           ) : error ? (
             <p>Error fetching charts: {error.message}</p>
           ) : (
-            covidData.map((chart, index) => {
-              const chartTitle = chart.results[0].metric;
-              const chartLikes =
-              chartsWithLikes?.find(
-                  (chartWithLikes) => chartWithLikes.title === chartTitle
-                );
-              console.log(chartLikes)
-              return (
-                <Col xs={{ span: 24 }}  lg={{ span: 12 }} key={index}>
-                  <Card className="card">
-                    <Title level={5}>{chartTitle}</Title>
-                    <Chart
-                      data={chart.results.map((result) => ({
-                        date: result.date,
-                        value: result.metric_value,
-                      }))}
-                      type={"line"}
-                    />
-                    <Row gutter={[16, 10]}>
+            covidData.map((covidDataItem, index) => (
+              <Col xs={{ span: 24 }}  lg={{ span: 12 }} key={index}>
+              <Card className="card">
+                <Title level={5}>{covidDataItem.chartData.results[0].metric} - {covidDataItem.chartId}</Title>
+                <Chart
+                  data={covidDataItem.chartData.results.map((result) => ({
+                    date: result.date,
+                    value: result.metric_value,
+                  }))}
+                  type={"line"}
+                />
+                <Row gutter={[16, 10]}>
+                  <Col>
+                    <Avatar size="small" icon={<UserOutlined />} />
+                  </Col>
+                  <Col flex={1}>
+                    <Row justify="end" gutter={16}>
                       <Col>
-                        <Avatar size="small" icon={<UserOutlined />} />
+                        3
+                        <Button
+                          icon={<CommentOutlined />}
+                          type="text"
+                          className="icon-right"
+                        />
                       </Col>
-                      <Col flex={1}>
-                        <Row justify="end" gutter={16}>
-                          <Col>
-                            3
-                            <Button
-                              icon={<CommentOutlined />}
-                              type="text"
-                              className="icon-right"
-                            />
-                          </Col>
-                          <Col>
-                          {typeof chartLikes === "number" ? chartLikes : 10}
-                            <Button
-                              icon={<HeartOutlined />}
-                              type="text"
-                              className="icon-right"
-                            />
-                          </Col>
-                        </Row>
+                      <Col>
+                        {covidDataItem.chartLikes}
+                        <Button
+                          icon={covidDataItem.isLikedByCurrentUser ? <HeartFilled />  :<HeartOutlined />}
+                          type="text"
+                          className="icon-right"
+                          onClick={() => toggleLike({
+                              userId: currentUser?.id,
+                              chartId: covidDataItem?.chartId
+                            })}
+                        />
                       </Col>
                     </Row>
-                  </Card>
-                </Col>
-              );
-            })
+                  </Col>
+                </Row>
+              </Card>
+            </Col>
+            ))
           )}
         </Row>
       </Content>

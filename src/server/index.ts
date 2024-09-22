@@ -1,7 +1,8 @@
 import { db } from "@/db/db";
 import { schema, uuidSchema } from "@/db/schema";
 import { initTRPC } from "@trpc/server";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, and } from "drizzle-orm";
+import { z } from "zod";
 
 //create a trpc server, initialize router and public procedure
 const trpcServer = initTRPC.create();
@@ -44,6 +45,48 @@ export const appRouter = router({
     .groupBy(schema.chart.id);
     return {user: users[0], charts: charts};
   }),
+
+
+  toggleLike: procedure
+  .input(z.object({
+    userId: z.number(),
+    chartId: z.number()
+  }))
+  .mutation(
+    async (opts) => {
+      const { userId, chartId } = opts.input; // Destructure input
+
+      const existingRecord = await db
+      .select()
+      .from(schema.userChart)
+      .where(
+        and(
+          (sql`${schema.userChart.userId} = ${userId}`), (sql`${schema.userChart.chartId} = ${chartId}`)
+        )
+      ).limit(1);
+
+      if (existingRecord.length > 0) {
+        // Record exists, so delete it
+        await db
+          .delete(schema.userChart)
+          .where(
+            and(
+              (sql`${schema.userChart.userId} = ${userId}`),(sql`${schema.userChart.chartId} = ${chartId}`)
+            )
+            
+          );
+        return { message: 'Like removed' };
+      } else {
+        // Record does not exist, so create it
+        await db.insert(schema.userChart).values({ userId, chartId }).returning();
+        return { message: 'Like added' };
+      }
+
+
+      //await db.insert(schema.userChart).values({userId : userId, chartId : chartId}).returning();
+    }
+  )
+  
 });
 
 //create trpc API type

@@ -1,4 +1,11 @@
-export interface CovidData {
+export interface CovidData{
+  chartId: number,
+  chartData: CovidChartData,
+  chartLikes: string | number,
+  isLikedByCurrentUser: boolean
+}
+
+export interface CovidChartData {
   count: number;
   next: string | null;
   previous: string | null;

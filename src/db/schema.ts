@@ -1,4 +1,5 @@
 import { pgTable, text, serial, uuid, integer } from 'drizzle-orm/pg-core'
+import { z } from 'zod';
 
 export const userTable = pgTable('users', {
      id: serial('id').primaryKey(),
@@ -24,3 +25,5 @@ export const schema = {
      chart: chartTable,
      userChart: userChartTable,
 }
+
+export const uuidSchema = z.string().uuid();

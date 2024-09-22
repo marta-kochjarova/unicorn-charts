@@ -10,27 +10,33 @@ import { useEffect, useState } from "react";
 import AppHeader from "./_components/AppHeader";
 import { CovidData, CovidMetric } from "./_utils/covidDataTypes";
 import PageHeader from "./_components/PageHeader";
-
-interface FinalCharts{
-  charts: FinalChart[]
-}
-
-interface FinalChart{
-  id: number, 
-  data: CovidMetric[],
-  likes: number
-}
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const { Title, Text } = Typography;
-
-  // Fetch charts with likes using trpc
-  const { data: chartsWithLikes, error, isLoading } = trpc.getChartsWithLikes.useQuery();
-
   const [covidData, setCovidData] = useState<CovidData[]>([]);
-  const [finalCharts, setFinalCharts] = useState<FinalCharts[]>([]);
 
-  // Fetch COVID data after charts are loaded
+  // Fetch current user or create if user doesnt exist
+  const CheckOrCreateUserInLS = (): string => {
+    if (typeof localStorage !== 'undefined') {
+      let userUUID = localStorage.getItem("userUUID"); 
+      if (!userUUID) {
+        userUUID = uuidv4();
+        localStorage.setItem("userUUID", userUUID);
+      }
+      return userUUID;
+    } 
+    return '';
+  }
+
+  //Fetch user & chart data from DB
+  const { data: userAndChartData, error, isLoading } = trpc.getUserAndChartData.useQuery(CheckOrCreateUserInLS());
+
+  const { user: currentUser, charts: chartsWithLikes } = userAndChartData && 'user' in userAndChartData && 'charts' in userAndChartData 
+  ? userAndChartData 
+  : { user: undefined, charts: undefined };
+
+  // Fetch COVID data after DB charts are loaded
   useEffect(() => {
     if (chartsWithLikes) {
       const fetchCovidData = async () => {
@@ -43,9 +49,6 @@ export default function Home() {
     }
 
   }, [chartsWithLikes]);
-
-
-
 
   return (
     <Layout className="layout">
@@ -66,7 +69,7 @@ export default function Home() {
             covidData.map((chart, index) => {
               const chartTitle = chart.results[0].metric;
               const chartLikes =
-                chartsWithLikes.find(
+              chartsWithLikes?.find(
                   (chartWithLikes) => chartWithLikes.title === chartTitle
                 );
               console.log(chartLikes)

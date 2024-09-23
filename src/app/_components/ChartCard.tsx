@@ -44,7 +44,7 @@ const ChartCard: React.FC<ChartCardProps> = ({ covidDataItem, refetch, covidData
   return (
     <Card className="card">
       <Title level={5}>
-        {covidDataItem.chartData.results[0].metric} - {covidDataItem.chartId}
+        {covidDataItem.chartData.results[0].metric}
       </Title>
       <Chart
         data={covidDataItem.chartData.results.map((result) => ({
